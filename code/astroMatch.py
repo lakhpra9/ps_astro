@@ -20,6 +20,7 @@ def getVashyaDataFrame():
     
     # ref-link = 'https://www.drikpanchang.com/tutorials/jyotisha/kundali-match/ashta-kuta/vashya-kuta.html'
     # more-ref = 'https://aaps.space/blog/vashya-matching/'
+    # Read more on 'https://aaps.space/blog/kundali-matching-process/'
 
     vashyaDict = {
     'चतुष्पद' : ['0-60', '255-285'],
@@ -41,9 +42,9 @@ def get_asthakoot_base_df():
     dfYonis = pd.read_excel('Nakshatras.xlsx')
     dfVashya = getVashyaDataFrame()
 
-    Naadis = NaadiList + NaadiList[::-1]
-    Naadis = Naadis * 4 + NaadiList
-    Naadis = [j for i in Naadis for j in [i]*4]
+    # Naadis = NaadiList + NaadiList[::-1]
+    # Naadis = Naadis * 4 + NaadiList
+    # Naadis = [j for i in Naadis for j in [i]*4]
 
     stp = 360/(27*4)
     degrees = np.arange(stp, 360 + stp, stp)
@@ -66,7 +67,7 @@ def get_asthakoot_base_df():
 
     df['yoni'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Yoni'].tolist()[0], axis=1)
     df['gana'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Gana'].tolist()[0], axis=1)
-    df['naadi'] = Naadis
+    df['naadi'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Naadi'].tolist()[0], axis=1)
 
     return df
 
@@ -74,10 +75,13 @@ def get_person_asthkoot_df(df, moonPosition):
     # df :  this is the base df desrived in the function get_asthakoot_base_df
     # moonPosition : In degrees in the sky (converted to UTC)
     
-    if moonPosition < 0:
-        idx = df['degrees'].sub(360 + moonPosition).abs().idxmin()
-    else:
-        idx = df['degrees'].sub(moonPosition).abs().idxmin() + 1
+    # if moonPosition < 0:
+    #     idx = df['degrees'].sub(360 + moonPosition).abs().idxmin()
+    # else:
+    #     idx = df['degrees'].sub(moonPosition).abs().idxmin() #+ 1
+
+    moonPosition = moonPosition % 360
+    idx = df[df['degrees'] >= moonPosition].index[0]
 
     dfFin = df.loc[[idx]]
     dfFin.reset_index(drop=True, inplace=True)
