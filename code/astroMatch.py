@@ -109,7 +109,7 @@ def get_matchmaking_df(maledf, femaledf):
     criterionList = ['varna', 'vashya', 'Tara', 'yoni', 'graha maitri', 'gana', 'bhakut', 'naadi']
 
     for criterion in criterionList:
-        dfSelct = pd.read_excel('matching_criterion.xlsx', sheet_name=criterion)
+        dfSelct = pd.read_excel('asthkoot_criterion.xlsx', sheet_name=criterion)
         dfSelct.set_index(dfSelct.columns, inplace=True)
         dfM.loc[criterion, 'Obtained'] = dfSelct.loc[dfM.loc[criterion, 'Female'], dfM.loc[criterion, 'Male']]
         
