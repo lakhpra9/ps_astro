@@ -1,0 +1,23 @@
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    display: flex;
+    background-repeat: no-repeat;
+    align-items: end;
+    order: -1; /* move the icon to the left side */
+    margin-right: 10px; /* add some space between the icon and the input field */
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+    color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    display: flex;
+    background-repeat: no-repeat;
+    align-items: end;
+    order: -1; /* move the icon to the left side */
+    margin-right: 10px; /* add some space between the icon and the input field */
+}
+
+.form-label {
+    font-weight: 700;
+}

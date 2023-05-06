@@ -20,10 +20,44 @@
 
 
 
-dfSelct = pd.read_excel('matching_criterion.xlsx', sheet_name=criterion)
-dfSelct.set_index(dfSelct.columns, inplace=True)
-dfM.loc[criterion, 'Obtained'] = dfSelct.loc[dfM.loc[criterion, 'Female'], dfM.loc[criterion, 'Male']]
+# dfSelct = pd.read_excel('matching_criterion.xlsx', sheet_name=criterion)
+# dfSelct.set_index(dfSelct.columns, inplace=True)
+# dfM.loc[criterion, 'Obtained'] = dfSelct.loc[dfM.loc[criterion, 'Female'], dfM.loc[criterion, 'Male']]
 
 
-dfRashi = pd.DataFrame(data=zodiac_signs, columns=['Rashi'])
-dfRashi.T.to_excel('test.xlsx')
+# dfRashi = pd.DataFrame(data=zodiac_signs, columns=['Rashi'])
+# dfRashi.T.to_excel('test.xlsx')
+
+
+# import pytz
+# from geopy.geocoders import Nominatim
+# geolocator = Nominatim(user_agent="my_app")
+
+# def get_utc_timezone(country):
+#     location = geolocator.geocode(country)
+#     timezone = pytz.timezone('UTC')
+#     if location is not None:
+#         timezone = pytz.timezone(pytz.country_timezones[location.address.split(',')[-1].strip()])
+#     return timezone
+
+
+# const countryInput = document.getElementById("country");
+
+# fetch("https://restcountries.com/v3.1/all")
+#     .then((response) => response.json())
+#     .then((data) => {
+#         const countryNames = data.map((country) => country.name.common);
+#         countryInput.setAttribute("list", "countryList");
+
+#         const dataList = document.createElement("datalist");
+#         dataList.setAttribute("id", "countryList");
+
+#         countryNames.forEach((countryName) => {
+#             const option = document.createElement("option");
+#             option.value = countryName;
+#             dataList.appendChild(option);
+#         });
+
+#         document.body.appendChild(dataList);
+#     })
+#     .catch((error) => console.error(error));

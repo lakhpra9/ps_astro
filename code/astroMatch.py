@@ -1,6 +1,5 @@
 import datetime
 import math
-
 import swisseph as swe
 swe.set_sid_mode(swe.SIDM_LAHIRI)
 
@@ -38,8 +37,8 @@ def getVashyaDataFrame():
     dfVashya.sort_values(by='Max Degrees', inplace=True, ignore_index=True)
     return dfVashya
 
-def get_asthakoot_base_df():
-    dfYonis = pd.read_excel('Nakshatras.xlsx')
+def get_asthakoot_base_df(filePath=None):
+    dfYonis = pd.read_excel('Nakshatras.xlsx') if filePath is None else pd.read_excel(filePath)
     dfVashya = getVashyaDataFrame()
 
     # Naadis = NaadiList + NaadiList[::-1]
@@ -71,7 +70,7 @@ def get_asthakoot_base_df():
 
     return df
 
-def get_person_asthkoot_df(df, moonPosition):
+def get_person_asthkoot_df(df, moonPosition, detailed=False):
     # df :  this is the base df desrived in the function get_asthakoot_base_df
     # moonPosition : In degrees in the sky (converted to UTC)
     
@@ -88,6 +87,11 @@ def get_person_asthkoot_df(df, moonPosition):
     dfFin['Tara'] = ''
 
     cols = ['nakshatra', 'varna', 'vashya', 'Tara', 'yoni', 'graha maitri', 'gana', 'rashiName', 'naadi']
+
+    if detailed:
+        cols = ['degrees', 'rashiName', 'nakshatraName', 'padas', 'varna', 'vashya', 'Tara', 
+                    'yoni', 'graha maitri', 'gana', 'rashiName', 'naadi']
+
     dfFin = dfFin[cols]
     dfFin.rename(columns={'rashiName':'bhakut'}, inplace=True)
 
@@ -147,6 +151,7 @@ class MatchMaking():
         return dt_utc
 
     def moon(self, dt_utc):
+        swe.set_sid_mode(swe.SIDM_LAHIRI)
         jd = swe.utc_to_jd(dt_utc.year , dt_utc.month, dt_utc.day, dt_utc.hour, dt_utc.minute, dt_utc.second)
         jd = float(jd[1])
         ayanamsha = swe.get_ayanamsa_ut(jd)
