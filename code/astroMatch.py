@@ -1,16 +1,20 @@
 import datetime
 import math
+
 import swisseph as swe
 swe.set_sid_mode(swe.SIDM_LAHIRI)
+
+import numpy as np
 import pandas as pd
 
 zodiac_signs = ['मेष', 'वृषभ', 'मिथुन', 'कर्क', 'सिंह', 'कन्या', 'तुला', 'वृश्चिक', 'धनु', 'मकर', 'कुंभ', 'मीन']
-nakshatras = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशीर्ष', 'आर्द्रा', 'पुनर्वसु', 'पुष्य', 'आश्लेषा', 'मघा', 'पूर्वफाल्गुनी', 'उत्तरफाल्गुनी', 'हस्त', 'चित्रा', 'स्वाति', 'विशाखा', 'अनूराधा', 'ज्येष्ठा', 'मूल', 'पूर्वाषाढ़ा', 'उत्तराषाढ़ा', 'श्रवण', 'श्रविष्ठा', 'शतभिषा', 'पूर्वभाद्रपद', 'उत्तरभाद्रपद', 'रेवती']
+nakshatras = ['अश्विनी', 'भरणी', 'कृत्तिका', 'रोहिणी', 'मृगशिरा', 'आर्द्रा', 'पुनर्वसु', 'पुष्य', 'आश्लेषा', 'मघा', 'पूर्वफाल्गुनी', 'उत्तरफाल्गुनी', 'हस्त', 'चित्रा', 'स्वाति', 'विशाखा', 'अनूराधा', 'ज्येष्ठा', 'मूल', 'पूर्वाषाढ़ा', 'उत्तराषाढ़ा', 'श्रवण', 'धनिष्ठा', 'शतभिषा', 'पूर्वभाद्रपद', 'उत्तरभाद्रपद', 'रेवती']
 padasList = ['1st Pada', '2nd Pada', '3rd Pada', '4th Pada']
 
 grihaSwami = ['मंगल', 'शुक्र', 'बुध', 'चंद्र', 'सूर्य', 'बुध', 'शुक्र', 'मंगल', 'गुरु', 'शनि', 'शनि', 'गुरु'] #['Mangal', 'Shukra', 'Budh', 'Chandra', 'Surya', 'Budh', 'Shukra', 'Mangal', 'Guru', 'Shani', 'Shani', 'Guru']
 varnaList = ['क्षत्रिय', 'वैश्य', 'शूद्र', 'ब्राह्मण'] # ['Kshatriya', 'Vaishya', 'Shudra', 'Brahmin']
 vashyaList = ['चतुष्पद', 'द्विपद-नर', 'जलचर', 'वनचर', 'कीट'] # ['Chatushpada', 'Dwipada/Nara', 'Jalachara', 'Vanachara', 'Keet',]
+NaadiList = ['आदि', 'मध्य', 'अंत्य'] # ['Aadi', 'Madhya', 'Antya']
 
 def getVashyaDataFrame():
     
@@ -32,6 +36,84 @@ def getVashyaDataFrame():
     dfVashya = pd.DataFrame(data, columns=['Max Degrees', 'Vashya'])
     dfVashya.sort_values(by='Max Degrees', inplace=True, ignore_index=True)
     return dfVashya
+
+def get_asthakoot_base_df():
+    dfYonis = pd.read_excel('Nakshatras.xlsx')
+    dfVashya = getVashyaDataFrame()
+
+    Naadis = NaadiList + NaadiList[::-1]
+    Naadis = Naadis * 4 + NaadiList
+    Naadis = [j for i in Naadis for j in [i]*4]
+
+    stp = 360/(27*4)
+    degrees = np.arange(stp, 360 + stp, stp)
+
+    df = pd.DataFrame(data=degrees, columns=['degrees'])
+    df['degrees'] = df['degrees'].apply(lambda x: round(x, 4))
+
+    df['rashi'] = [j for i in range(len(zodiac_signs)) for j in [i]*9]
+    df['rashiName'] = df.apply(lambda x: zodiac_signs[int(x['rashi'])], axis=1)
+    df['nakshatra'] = [j for i in range(len(nakshatras)) for j in [i]*4]
+    df['nakshatraName'] = df.apply(lambda x: nakshatras[int(x['nakshatra'])], axis=1)
+    df['padas'] = [i for i in range(1, 5)] * 27
+
+    cols = ['degrees', 'rashi', 'nakshatra', 'rashiName', 'nakshatraName', 'padas']
+    df = df[cols]
+
+    df['graha maitri'] = [j for i in grihaSwami for j in [i]*9]
+    df['varna'] = [j for i in varnaList for j in [i]*9] * 3
+    df['vashya'] = df.apply(lambda x: dfVashya.loc[dfVashya['Max Degrees'] >= x['degrees'], 'Vashya'].tolist()[0], axis=1)
+
+    df['yoni'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Yoni'].tolist()[0], axis=1)
+    df['gana'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Gana'].tolist()[0], axis=1)
+    df['naadi'] = Naadis
+
+    return df
+
+def get_person_asthkoot_df(df, moonPosition):
+    # df :  this is the base df desrived in the function get_asthakoot_base_df
+    # moonPosition : In degrees in the sky (converted to UTC)
+    
+    if moonPosition < 0:
+        idx = df['degrees'].sub(360 + moonPosition).abs().idxmin()
+    else:
+        idx = df['degrees'].sub(moonPosition).abs().idxmin() + 1
+
+    dfFin = df.loc[[idx]]
+    dfFin.reset_index(drop=True, inplace=True)
+    dfFin['Tara'] = ''
+
+    cols = ['nakshatra', 'varna', 'vashya', 'Tara', 'yoni', 'graha maitri', 'gana', 'rashiName', 'naadi']
+    dfFin = dfFin[cols]
+    dfFin.rename(columns={'rashiName':'bhakut'}, inplace=True)
+
+    return dfFin
+
+
+def get_matchmaking_df(maledf, femaledf):
+    dfM = maledf.T.rename(columns={0:'Male'})
+    dfM = dfM.join(femaledf.T.rename(columns={0:'Female'}))
+
+    maleNakshatra = dfM.loc['nakshatra', 'Male']
+    femaleNakshatra = dfM.loc['nakshatra', 'Female']
+    dfM.loc['Tara', 'Male'] =  ((femaleNakshatra - maleNakshatra) % 27) % 9 +1
+    dfM.loc['Tara', 'Female'] =  ((maleNakshatra - femaleNakshatra) % 27) % 9 +1
+    dfM.drop(index=['nakshatra'], inplace=True)
+    dfM['Obtained'] = ''
+    dfM['Max Points'] = range(1, 9)
+
+    criterionList = ['varna', 'vashya', 'Tara', 'yoni', 'graha maitri', 'gana', 'bhakut', 'naadi']
+
+    for criterion in criterionList:
+        dfSelct = pd.read_excel('matching_criterion.xlsx', sheet_name=criterion)
+        dfSelct.set_index(dfSelct.columns, inplace=True)
+        dfM.loc[criterion, 'Obtained'] = dfSelct.loc[dfM.loc[criterion, 'Female'], dfM.loc[criterion, 'Male']]
+        
+    dfM['Obtained'] = dfM['Obtained'].astype('float64')
+        
+    # total_points = sum(dfM[~dfM['Obtained'].eq('')]['Obtained'].tolist())
+
+    return dfM
 
 
 class MatchMaking():
