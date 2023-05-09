@@ -9,6 +9,8 @@
         <link rel="stylesheet" type="text/css" href="{% static 'custom/myStyle.css' %}" />
     </head>
     <body>
+        {% include '_navbar.html' %}
+
         {% block content %}{% endblock %}
 
         <!-- Link to jQuery -->

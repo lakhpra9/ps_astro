@@ -37,7 +37,7 @@ def getVashyaDataFrame():
     dfVashya.sort_values(by='Max Degrees', inplace=True, ignore_index=True)
     return dfVashya
 
-def get_asthakoot_base_df(filePath=None):
+def get_asthakoot_base_df(filePath=None, changeColName=False):
     dfYonis = pd.read_excel('Nakshatras.xlsx') if filePath is None else pd.read_excel(filePath)
     dfVashya = getVashyaDataFrame()
 
@@ -68,7 +68,28 @@ def get_asthakoot_base_df(filePath=None):
     df['gana'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Gana'].tolist()[0], axis=1)
     df['naadi'] = df.apply(lambda x: dfYonis[dfYonis['index'] == x['nakshatra']]['Naadi'].tolist()[0], axis=1)
 
+    print(df.columns)
+
+    if changeColName:
+        df.columns = ['डिग्री', 'राशि', 'नक्षत्र', 'राशी नाम', 'नक्षत्र नाम', 'पाद', 'ग्रह मैत्री', 'वर्ण', 'वस्य', 'योनी', 'गण', 'नाडी']
+
     return df
+
+def get_moon_info_with_asthkoot(df, moon, changeColName=False):
+    moonPosition = moon.position
+
+    moonPosition = moonPosition % 360
+    idx = df[df['degrees'] >= moonPosition].index[0]
+    dfFin = df.loc[[idx]]
+    dfFin.reset_index(drop=True, inplace=True)
+
+    if changeColName:
+        dfFin.columns = ['डिग्री', 'राशि', 'नक्षत्र', 'राशी नाम', 'नक्षत्र नाम', 'पाद', 'ग्रह मैत्री', 'वर्ण', 'वस्य', 'योनी', 'गण', 'नाडी']
+        joinList = [str(round(moonPosition,4)), str(dfFin.loc[0, 'डिग्री'])]
+        dfFin.loc[0, 'डिग्री'] = ' > '.join(joinList)
+        dfFin.insert(1, 'अंशः कलाः विकला', moon.AKV)
+
+    return dfFin
 
 def get_person_asthkoot_df(df, moonPosition, detailed=False):
     # df :  this is the base df desrived in the function get_asthakoot_base_df
@@ -186,6 +207,7 @@ class MatchMaking():
         self.padaName = padasList[nakshatra_pada]
 
         self.overview = f'{self.rashi} [{self.rashiName}] {self.ansh}:{self.kala}:{self.vikala} | {self.nakshatraName} & {self.padaName}'
+        self.AKV = f'{self.ansh}:{self.kala}:{self.vikala}'
 
         return self
     
