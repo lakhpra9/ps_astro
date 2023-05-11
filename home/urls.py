@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('get_astrology', views.get_astrology, name='get_astrology'),
     path('asthkoot_table', views.asthkoot_table, name='asthkoot_table'),
+    path('match_making', views.match_making, name='match_making'),
 ]

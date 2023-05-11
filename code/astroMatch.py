@@ -91,6 +91,50 @@ def get_moon_info_with_asthkoot(df, moon, changeColName=False):
 
     return dfFin
 
+
+def get_matchmaking_df_v1(maledf, femaledf, criterion_df_path=None):
+    cols = ['degrees', 'RKV', 'rashi', 'nakshatra', 'rashiName', 'nakshatraName', 'padas', 'graha maitri', 'varna', 'vashya', 'yoni', 'gana', 'naadi']
+    maledf.columns, femaledf.columns = cols, cols
+    maledf['Tara'] = ''
+    femaledf['Tara'] = ''
+
+    dfM = maledf.T.rename(columns={0:'Male'})
+    dfM = dfM.join(femaledf.T.rename(columns={0:'Female'}))
+
+    maleNakshatra = dfM.loc['nakshatra', 'Male']
+    femaleNakshatra = dfM.loc['nakshatra', 'Female']
+    dfM.loc['Tara', 'Male'] =  ((femaleNakshatra - maleNakshatra) % 27) % 9 +1
+    dfM.loc['Tara', 'Female'] =  ((maleNakshatra - femaleNakshatra) % 27) % 9 +1
+    dfM.drop(index=['nakshatra'], inplace=True)
+    dfM['Obtained'] = ''
+    # dfM['Max Points'] = range(1, 9)
+
+    dfM = dfM.T
+    criterionList = ['varna', 'vashya', 'Tara', 'yoni', 'graha maitri', 'gana', 'rashiName', 'naadi']
+    dfM = dfM[criterionList]
+    dfM.rename(columns={'rashiName':'bhakut'}, inplace=True)
+    dfM = dfM.T
+
+    criterionList = ['varna', 'vashya', 'Tara', 'yoni', 'graha maitri', 'gana', 'bhakut', 'naadi']
+
+    for criterion in criterionList:
+        if criterion_df_path is None:
+            dfSelct = pd.read_excel('asthkoot_criterion.xlsx', sheet_name=criterion)
+        else:
+            dfSelct = pd.read_excel(criterion_df_path, sheet_name=criterion)
+        dfSelct.set_index(dfSelct.columns, inplace=True)
+        dfM.loc[criterion, 'Obtained'] = dfSelct.loc[dfM.loc[criterion, 'Female'], dfM.loc[criterion, 'Male']]
+
+    dfM['Obtained'] = dfM['Obtained'].astype('float64')
+    total_points = sum(dfM[~dfM['Obtained'].eq('')]['Obtained'].tolist())
+    
+    dfM = dfM.T
+
+    return [dfM, total_points]
+
+
+
+
 def get_person_asthkoot_df(df, moonPosition, detailed=False):
     # df :  this is the base df desrived in the function get_asthakoot_base_df
     # moonPosition : In degrees in the sky (converted to UTC)
@@ -117,6 +161,9 @@ def get_person_asthkoot_df(df, moonPosition, detailed=False):
     dfFin.rename(columns={'rashiName':'bhakut'}, inplace=True)
 
     return dfFin
+
+
+
 
 
 def get_matchmaking_df(maledf, femaledf):

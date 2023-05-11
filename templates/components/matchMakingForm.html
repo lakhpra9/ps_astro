@@ -1,0 +1,36 @@
+<form method="post" action="{% url 'home:match_making' %}">
+    {% csrf_token %}
+    <div class="row">
+        <h3 class="txt_h3">Male</h3>
+        <div class="col-md-4 mb-3">
+            <label for="m_dob" class="form-label">Date of Birth:</label>
+            <input type="date" class="form-control" id="m_dob" name="m_dob" {% if m_dob %} value="{{m_dob}}" {% else %} value="1995-05-27" {% endif %} required />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="m_tob" class="form-label">Time of Birth:</label>
+            <input type="time" class="form-control" id="m_tob" name="m_tob" {% if m_tob %} value="{{m_tob}}" {% else %} value="22:35" {% endif %} required />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="m_timezone" class="form-label">UTC Timezone:</label>
+            <input type="text" class="form-control" id="m_timezone" name="m_timezone" {% if m_tz %} value="{{m_tz}}" {% else %} value="+05:30" {% endif %} required />
+        </div>
+    </div>
+    <div class="row">
+        <h3 class="txt_h3">Female</h3>
+        <div class="col-md-4 mb-3">
+            <label for="f_dob" class="form-label">Date of Birth:</label>
+            <input type="date" class="form-control" id="f_dob" name="f_dob" {% if f_dob %} value="{{f_dob}}" {% else %} value="1995-05-27" {% endif %} required />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="f_tob" class="form-label">Time of Birth:</label>
+            <input type="time" class="form-control" id="f_tob" name="f_tob" {% if f_tob %} value="{{f_tob}}" {% else %} value="22:35" {% endif %} required />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="f_timezone" class="form-label">UTC Timezone:</label>
+            <input type="text" class="form-control" id="f_timezone" name="f_timezone" {% if f_tz %} value="{{f_tz}}" {% else %} value="+05:30" {% endif %} required />
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>

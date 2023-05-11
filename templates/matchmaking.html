@@ -1,0 +1,35 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+    <h1 class="text-center mt-5">Enter Your Information</h1>
+    <hr />
+    {% include 'components/matchMakingForm.html' %}
+    <hr />
+    {% if male_moondf %}
+    <h3 class="text-center my-3">Male Moon Information</h3>
+    <div class="container text-center">{{male_moondf|safe}}</div>
+    <hr />
+    {% endif %}
+
+    <!--This is a comment. Comments are not displayed in the browser-->
+    {% if female_moondf %}
+    <h3 class="text-center my-3">Female Moon Information</h3>
+    <div class="container text-center">{{female_moondf|safe}}</div>
+    <hr />
+    {% endif %}
+
+    <!--This is a comment. Comments are not displayed in the browser-->
+    {% if match_df %}
+    <h3 class="text-center my-3">Match Making Results</h3>
+    <div class="container text-center">{{match_df|safe}}</div>
+    <hr />
+    {% endif %}
+
+    <!--This is a comment. Comments are not displayed in the browser-->
+    {% if total_points %}
+    <h2 class="text-center my-3">Total Points = {{total_points}}</h2>
+    {% endif %}
+</div>
+
+<!--This is a comment. Comments are not displayed in the browser-->
+{% endblock %}

@@ -25,3 +25,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .mytable thead {
     background-color: bisque;
 }
+
+.txt_h3 {
+    color: rgb(236, 130, 31);
+    border-bottom: 1px solid rgba(219, 149, 64, 0.425);
+    text-align: center;
+    padding: 10px;
+}
